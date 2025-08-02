@@ -26,19 +26,10 @@ class front:
         self.pastel = PhotoImage(file='img/pastel.png')
         self.concluido = PhotoImage(file='img/botaoconcluido.png')
         self.confirmar = PhotoImage(file='img/botaoconfirmar.png')
-        self.retorno = PhotoImage(file='img/f5.png')
+        self.retorno = PhotoImage(file='img/return.png')
         self.lixeira = PhotoImage(file='img/lixeira.png')
-        self.confirmar_o = Image.open("img/botaoconfirmar.png")
-        self.confirmar_n = self.confirmar_o.resize((65,65))
-        self.confirmar = ImageTk.PhotoImage(self.confirmar_n)
-        self.retorno_o = Image.open("img/f5.png")
-        self.retorno_n = self.retorno_o.resize((125,125))
-        self.retorno = ImageTk.PhotoImage(self.retorno_n)
-        self.lixeira_o = Image.open("img/lixeira.png")
-        self.lixeira_n = self.lixeira_o.resize((65,65))
-        self.lixeira = ImageTk.PhotoImage(self.lixeira_n)
         self.voltf5=PhotoImage(file="img/f5.png")
-
+        self.mais = PhotoImage(file="img/mais.png")
 
     def mysqlconnect(self):
         try:
@@ -137,7 +128,7 @@ class front:
         self.qtnf = Frame(self.garcom,bg='#38312D')
         self.qtnf.place(x=860,y=450)
         self.botoesf = Frame(self.garcom)
-        self.botoesf.place(x=860,y=475)
+        self.botoesf.place(x=860,y=500)
         # Botoes do cardapio
         self.opção1 = Button(self.cardapio, image=self.expresso, command=self.Expresso,bg='#38312D',bd=0,activebackground='#38312D')
         self.opção1.pack(side='top')
@@ -156,36 +147,22 @@ class front:
 
         #Botoes de Controle
         #quantidade:
-        self.qtnt = Label(self.qtnf, text="Quantidade",font=('arial',15, 'bold'),fg="#D9D9D9",bg='#38312D')
+        self.qtnt = Label(self.qtnf, text="Quantidade ",font=('arial',15, 'bold'),fg="#D9D9D9",bg='#38312D')
         self.qtnt.pack(side='left')
         self.qtn = Entry(self.qtnf, font=100, width=15,bd =0)
         self.qtn.pack(side='right')
         #Mesa
-        self.mesa = Label(self.mesaf, text="Mesa",font=('arial',15, 'bold'),fg="#D9D9D9",bg='#38312D')
+        self.mesa = Label(self.mesaf, text="Mesa ",font=('arial',15, 'bold'),fg="#D9D9D9",bg='#38312D')
         self.mesa.pack(side='left')
         self.nmesa = Entry(self.mesaf, font=100, width=15,bd = 0)
         self.nmesa.pack(side='right')
-        #add
-        self.add = Button(self.botoesf,image=self.confirmar,command=self.quantidade,bg='#38312D',bd=0,)
-        self.add.pack(side='left')
-        #deletar
-        self.returne = Button(self.garcom,image=self.voltf5,bg='#38312D',bd=0,command=self.botaoReturne)
-        self.returne.place(x=1100,y=490)
-        self.delete = customtkinter.CTkButton(
-            self.botoesf,
-            text="X",
-            text_color="red",
-            font=("Arial", 40, "bold"),
-            bg_color="#38312D",
-            fg_color="#D9D9D9",
-            corner_radius=15,
-            width=57,
-            height=57,
-            command=self.botaoX
-        )
+        #deletar,retornar e adicionar
+        self.delete = Button(self.botoesf,image=self.lixeira,bg='#38312D',bd=0,command=self.botaoX)
         self.delete.pack(side='right')
-        # self.delete.place(x=1025, y=485)
-
+        self.returne = Button(self.botoesf,image=self.retorno,bg='#38312D',bd=0,command=self.botaoReturne)
+        self.returne.pack(side='right')
+        self.add = Button(self.botoesf,image=self.mais,command=self.quantidade,bg='#38312D',bd=0,)
+        self.add.pack(side='left')
         #Lista do q estas a adicionar
         self.itens = Listbox(self.garcom,bg='#38312D',fg="#D9D9D9",font=("Inknut Antiqua", 12), width=30, height=6)
         self.itens.place(x=875, y=75)
@@ -254,7 +231,10 @@ class front:
         pedmesa=self.cur.fetchall()
         self.pedmesabonito="\n".join(str(p[0]) for p in pedmesa)
         self.cur.execute('INSERT INTO ordem (pedido) VALUES (%s)',(self.pedmesabonito))
-        self.cur.execute('DELETE FROM barista where pedidocompl LIKE %s', (f"{self.confmesa}%",))
+        if self.confmesa == "":
+            print("Não selecionaste a mesa")
+        else:
+            self.cur.execute('DELETE FROM barista where pedidocompl LIKE %s', (f"{self.confmesa}%",))
 
         self.pedido=[]
         self.janelabarista.destroy()
@@ -345,7 +325,7 @@ class front:
         seta=Button(self.janelabarista, image=self.st,borderwidth=0,bg="#38312D", command=self.voltar)
         seta.grid(row=0, column=0, pady=2, padx=2, sticky="w")
 
-        jan=Label(self.janelabarista, text="BARISTA", font=("Inknut Antiqua Regular", 24), fg="#D9D9D9", bg="#38312D")
+        jan=Label(self.janelabarista, text="BARISTA", font=("Inknut Antiqua", 24), fg="#D9D9D9", bg="#38312D")
         jan.grid(row=1, column=0, pady=3)
 
         linhab= Frame(self.janelabarista, bg="#D9D9D9", height=1, width=500)        
@@ -383,7 +363,7 @@ class front:
         self.ate.place(x=975,y=130)
         #Botoes para data minima
         self.dia1 = Entry(self.atend,bd=1, font=(175), width=10)
-        self.dia1.place(x=825,y=110)
+        self.dia1.place(x=825,y=110,)
         self.dia1.insert(0,self.dia)
         self.dia1.bind("<FocusIn>", self.retirar1)
         self.dia1.bind("<FocusOut>", self.colocar1)
